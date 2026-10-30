@@ -52,6 +52,18 @@ let S = DB.cargarEstado(db, O);
 St.usar(S);
 let version = 1;
 function persistir() { DB.guardarEstado(db, S, O); version += 1; }
+
+// Si la base ya existía cuando se definió CLAVE_INICIAL, las cuentas que siguen con la contraseña pública de prueba pasan a usarla
+if (process.env.CLAVE_INICIAL && !Auth.claveValida(process.env.CLAVE_INICIAL)) {
+  const prueba = O.semilla().cuentas[0].clave;
+  if (process.env.CLAVE_INICIAL === prueba) console.warn('Aviso: CLAVE_INICIAL es la contraseña pública de prueba. Usa otra para el sitio publicado.');
+  const conPrueba = process.env.CLAVE_INICIAL === prueba ? [] : S.cuentas.filter((c) => Auth.verificarClave(prueba, c.claveHash));
+  if (conPrueba.length) {
+    conPrueba.forEach((c) => { c.claveHash = Auth.hashClave(process.env.CLAVE_INICIAL); Auth.cerrarSesionesDe(db, c.id); });
+    persistir();
+    console.log('CLAVE_INICIAL aplicada a ' + conPrueba.length + ' cuentas que usaban la contraseña de prueba.');
+  }
+}
 function recargar() { S = DB.cargarEstado(db, O); St.usar(S); }
 setInterval(() => { try { if (St.tick()) persistir(); } catch (e) { console.error(e); recargar(); } }, 20000).unref();
 
