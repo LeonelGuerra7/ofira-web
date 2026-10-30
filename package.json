@@ -1,0 +1,13 @@
+{
+  "name": "ofira",
+  "version": "1.0.0",
+  "description": "Ofira · Encuentra, cotiza y contrata con confianza. Plataforma de oficios para Asunción Mita, Jutiapa.",
+  "private": true,
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/server.js",
+    "reiniciar-datos": "node tools/reiniciar-datos.js"
+  },
+  "engines": { "node": ">=22.13" },
+  "license": "UNLICENSED"
+}
